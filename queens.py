@@ -9,22 +9,58 @@ import pygame
 import pygame.freetype
 import time
 
+
 def draw_board_background(screen):
     # Fill the background with white
     screen.fill((255, 255, 255))
 
     # draw vertical lines
-    pygame.draw.rect(screen, (0, 0, 0), pygame.Rect(0, 0, LINE_THICKNESS // 2, GRID_PIXEL_HEIGHT))
-    pygame.draw.rect(screen, (0, 0, 0), pygame.Rect(GRID_PIXEL_WIDTH - (LINE_THICKNESS // 2), 0, LINE_THICKNESS, GRID_PIXEL_HEIGHT))
-    for x in range((GRID_PIXEL_WIDTH // 8) - (LINE_THICKNESS // 2), GRID_PIXEL_WIDTH, GRID_PIXEL_WIDTH // 8):
+    pygame.draw.rect(
+        screen, (0, 0, 0), pygame.Rect(0, 0, LINE_THICKNESS // 2, GRID_PIXEL_HEIGHT)
+    )
+    pygame.draw.rect(
+        screen,
+        (0, 0, 0),
+        pygame.Rect(
+            GRID_PIXEL_WIDTH - (LINE_THICKNESS // 2),
+            0,
+            LINE_THICKNESS,
+            GRID_PIXEL_HEIGHT,
+        ),
+    )
+    for x in range(
+        (GRID_PIXEL_WIDTH // 8) - (LINE_THICKNESS // 2),
+        GRID_PIXEL_WIDTH,
+        GRID_PIXEL_WIDTH // 8,
+    ):
         # print(x)
-        pygame.draw.rect(screen, (0, 0, 0), pygame.Rect(x, 0, LINE_THICKNESS, GRID_PIXEL_HEIGHT))
+        pygame.draw.rect(
+            screen, (0, 0, 0), pygame.Rect(x, 0, LINE_THICKNESS, GRID_PIXEL_HEIGHT)
+        )
 
     # draw horizontal lines
-    pygame.draw.rect(screen, (0, 0, 0), pygame.Rect(0, 0, GRID_PIXEL_WIDTH, LINE_THICKNESS // 2))
-    pygame.draw.rect(screen, (0, 0, 0), pygame.Rect(0, GRID_PIXEL_WIDTH - (LINE_THICKNESS // 2), GRID_PIXEL_WIDTH, LINE_THICKNESS))
-    for y in range((GRID_PIXEL_HEIGHT // 8) - (LINE_THICKNESS // 2), GRID_PIXEL_HEIGHT, GRID_PIXEL_HEIGHT // 8):
-        pygame.draw.rect(screen, (0, 0, 0), pygame.Rect(0, y, GRID_PIXEL_WIDTH, LINE_THICKNESS))
+    pygame.draw.rect(
+        screen, (0, 0, 0), pygame.Rect(0, 0, GRID_PIXEL_WIDTH, LINE_THICKNESS // 2)
+    )
+    pygame.draw.rect(
+        screen,
+        (0, 0, 0),
+        pygame.Rect(
+            0,
+            GRID_PIXEL_WIDTH - (LINE_THICKNESS // 2),
+            GRID_PIXEL_WIDTH,
+            LINE_THICKNESS,
+        ),
+    )
+    for y in range(
+        (GRID_PIXEL_HEIGHT // 8) - (LINE_THICKNESS // 2),
+        GRID_PIXEL_HEIGHT,
+        GRID_PIXEL_HEIGHT // 8,
+    ):
+        pygame.draw.rect(
+            screen, (0, 0, 0), pygame.Rect(0, y, GRID_PIXEL_WIDTH, LINE_THICKNESS)
+        )
+
 
 def draw_board(screen, font, board, check_mode=False):
     for i in range(GRID_SIZE):
@@ -34,7 +70,13 @@ def draw_board(screen, font, board, check_mode=False):
 
             # add colors
             color = tile.color
-            r = pygame.Rect((0, 0), (GRID_PIXEL_WIDTH // 8 - LINE_THICKNESS, GRID_PIXEL_HEIGHT // 8 - LINE_THICKNESS))
+            r = pygame.Rect(
+                (0, 0),
+                (
+                    GRID_PIXEL_WIDTH // 8 - LINE_THICKNESS,
+                    GRID_PIXEL_HEIGHT // 8 - LINE_THICKNESS,
+                ),
+            )
             r.center = tile_center
             pygame.draw.rect(screen, COLOR_TO_TUPLE[color], r)
 
@@ -83,6 +125,7 @@ def draw_board(screen, font, board, check_mode=False):
                 # r.center = tile_center
                 # pygame.draw.rect(screen, queen_color, r)
 
+
 def draw_time(screen, font, elapsed_time):
     elapsed_minutes = elapsed_time // 60
     elapsed_seconds = elapsed_time % 60
@@ -91,22 +134,22 @@ def draw_time(screen, font, elapsed_time):
         elapsed_minutes = f"0{elapsed_minutes}"
     else:
         elapsed_minutes = str(elapsed_minutes)
-    
+
     if elapsed_seconds < 10:
         elapsed_seconds = f"0{elapsed_seconds}"
     else:
         elapsed_seconds = str(elapsed_seconds)
-
 
     text_str = f"{elapsed_minutes}:{elapsed_seconds}"
     text_rect = font.get_rect(text_str)
     text_rect.center = (GRID_PIXEL_WIDTH + (SIDE_PANEL_WIDTH // 2), text_rect.height)
     font.render_to(screen, text_rect.topleft, text_str, (0, 0, 0))
 
+
 def handle_grid_mouse_click(board, screen_posn, button):
     if board.is_solved():
         return
-    
+
     i, j = screen_posn
 
     if i >= 0 and i < GRID_PIXEL_WIDTH and j >= 0 and j < GRID_PIXEL_HEIGHT:
@@ -117,7 +160,10 @@ def handle_grid_mouse_click(board, screen_posn, button):
             if tile.state != TileState.QUESTION:
                 next_state = TileState((tile.state.value + 1) % (len(TileState) - 1))
 
-                other_queens = any(other_tile.state == TileState.QUEEN for other_tile in board.color_groups[tile.color])
+                other_queens = any(
+                    other_tile.state == TileState.QUEEN
+                    for other_tile in board.color_groups[tile.color]
+                )
                 if next_state == TileState.QUEEN:
                     if not other_queens:
                         tile.state = next_state
@@ -131,6 +177,7 @@ def handle_grid_mouse_click(board, screen_posn, button):
             elif tile.state == TileState.QUESTION:
                 tile.state = TileState.EMPTY
 
+
 if __name__ == "__main__":
     """
     TODO:
@@ -143,8 +190,8 @@ if __name__ == "__main__":
     # Set up the drawing window
     screen = pygame.display.set_mode([SCREEN_WIDTH, SCREEN_HEIGHT])
     board = Board.generate_random_board()
-    large_font = pygame.freetype.SysFont('Comic Sans MS', 60)
-    small_font = pygame.freetype.SysFont('Comic Sans MS', 20)
+    large_font = pygame.freetype.SysFont("Comic Sans MS", 60)
+    small_font = pygame.freetype.SysFont("Comic Sans MS", 20)
 
     # initialize buttons
     new_game_button = Button("New Game", (200, 50), small_font)
@@ -157,7 +204,7 @@ if __name__ == "__main__":
     give_up_button.set_position((GRID_PIXEL_WIDTH + (SIDE_PANEL_WIDTH // 2), 400))
 
     # state for button logic
-    check_until = 0 # time at which to stop showing "check" hints
+    check_until = 0  # time at which to stop showing "check" hints
 
     start_time = time.time()
     elapsed_time = int(time.time() - start_time)
@@ -175,14 +222,23 @@ if __name__ == "__main__":
                 handle_grid_mouse_click(board, pygame.mouse.get_pos(), event.button)
 
                 # handle pressing screen buttons
-                if new_game_button.is_in_bounds(pygame.mouse.get_pos()) and event.button == 1:
+                if (
+                    new_game_button.is_in_bounds(pygame.mouse.get_pos())
+                    and event.button == 1
+                ):
                     board = Board.generate_random_board()
                     start_time = time.time()
 
-                if check_board_button.is_in_bounds(pygame.mouse.get_pos()) and event.button == 1:
+                if (
+                    check_board_button.is_in_bounds(pygame.mouse.get_pos())
+                    and event.button == 1
+                ):
                     check_until = time.time() + 1
 
-                if give_up_button.is_in_bounds(pygame.mouse.get_pos()) and event.button == 1:
+                if (
+                    give_up_button.is_in_bounds(pygame.mouse.get_pos())
+                    and event.button == 1
+                ):
                     for i in range(GRID_SIZE):
                         for j in range(GRID_SIZE):
                             if (i, j) in board.queen_posns:
@@ -190,7 +246,7 @@ if __name__ == "__main__":
                             else:
                                 board.get_tile((i, j)).state = TileState.EMPTY
 
-
+        # draw everything
         draw_board_background(screen)
         draw_board(screen, small_font, board, check_mode=time.time() < check_until)
         draw_time(screen, large_font, elapsed_time)
@@ -198,11 +254,9 @@ if __name__ == "__main__":
         new_game_button.draw(screen)
         check_board_button.draw(screen)
         give_up_button.draw(screen)
-        
+
         pygame.display.flip()
         clock.tick(60)
-
-        
 
     # Done! Time to quit.
     pygame.quit()

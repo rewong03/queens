@@ -13,7 +13,4 @@ GRID_SIZE = 8
 
 FPS = 60
 
-COLOR_SIZE_COUNTS = {
-    3: 2,
-    4: 4
-}
+MIN_COLOR_SIZE_COUNTS = {25: 1}

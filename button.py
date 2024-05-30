@@ -1,6 +1,7 @@
 import pygame
 import pygame.freetype
 
+
 class Button:
     def __init__(self, text_str, button_size, font):
         self.text_str = text_str
@@ -21,5 +22,9 @@ class Button:
     def is_in_bounds(self, posn):
         i, j = posn
 
-        return (i >= self.button_rect.x and i <= (self.button_rect.x + self.button_rect.width) and
-            j >= self.button_rect.y and j <= (self.button_rect.y + self.button_rect.height))
+        return (
+            i >= self.button_rect.x
+            and i <= (self.button_rect.x + self.button_rect.width)
+            and j >= self.button_rect.y
+            and j <= (self.button_rect.y + self.button_rect.height)
+        )

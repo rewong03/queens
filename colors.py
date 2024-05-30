@@ -10,6 +10,7 @@ class Color(Enum):
     MAGENTA = 7
     GRAY = 8
 
+
 # TODO
 COLOR_TO_TUPLE = {
     Color.RED: (230, 128, 105),
@@ -19,5 +20,5 @@ COLOR_TO_TUPLE = {
     Color.TEAL: (178, 209, 214),
     Color.PURPLE: (182, 166, 221),
     Color.MAGENTA: (203, 163, 187),
-    Color.GRAY: (224, 224, 224)
+    Color.GRAY: (224, 224, 224),
 }
