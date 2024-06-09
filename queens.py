@@ -5,6 +5,9 @@ from colors import COLOR_TO_TUPLE
 from tile import TileState
 from button import Button
 import argparse
+import os
+import json
+from multiprocessing import Queue, Process
 
 import pygame
 import pygame.freetype
@@ -179,6 +182,37 @@ def handle_grid_mouse_click(board, screen_posn, button):
                 tile.state = TileState.EMPTY
 
 
+def _generate_boards_in_background(board_q, kill_q):
+    while True:
+        # check if we have been killed :(
+        try:
+            kill_q.get_nowait()
+            print("Dying!")
+            return
+        except:
+            pass
+
+        print("Generating board!")
+        board = Board.generate_random_board()
+        print("Done generating!")
+
+        while True:
+            try:
+                kill_q.get(False)
+                print("Dying!")
+                return
+            except:
+                pass
+
+            try:
+                board_q.put_nowait(board)
+                print("Generated board!")
+                break
+            except:
+                time.sleep(1)
+
+
+
 if __name__ == "__main__":
     """
     TODO:
@@ -191,13 +225,35 @@ if __name__ == "__main__":
     parser.add_argument('-d', '--debug', action='store_true', help='Enable debug mode')
     args = parser.parse_args()
 
+    # setup a directory for state
+    if not os.path.exists(".queens"):
+        os.mkdir(".queens")
+
+    # grabbed cached boards
+    cached_boards = []
+    if os.path.exists(".queens/cache.json"):
+        with open(".queens/cache.json") as f:
+            cached_boards = json.load(f)
+
+    print(f"Read {len(cached_boards)}")
+
+    board_queue = Queue(5)
+    for board in cached_boards[:5]:
+        board_queue.put(Board.from_dict(board))
+
+    # spawn a worker process to get boards in the background
+    kill_q = Queue()
+    board_generator = Process(target=_generate_boards_in_background, args=(board_queue, kill_q), daemon=True)
+    board_generator.start()
+
     pygame.init()
     pygame.font.init()
     clock = pygame.time.Clock()
 
     # Set up the drawing window
     screen = pygame.display.set_mode([SCREEN_WIDTH, SCREEN_HEIGHT])
-    board = Board.generate_random_board()
+    board = board_queue.get()
+    print("Got board!")
     large_font = pygame.freetype.SysFont("Comic Sans MS", 60)
     small_font = pygame.freetype.SysFont("Comic Sans MS", 20)
 
@@ -241,7 +297,20 @@ if __name__ == "__main__":
                     new_game_button.draw(screen)
                     pygame.display.flip()
 
-                    board = Board.generate_random_board()
+                    while True:
+                        try:
+                            board = board_queue.get_nowait()
+                            break
+                        except:
+                            pass
+
+                        for event_2 in pygame.event.get():
+                            if event_2.type == pygame.QUIT:
+                                running = False
+                                break
+
+                        if not running:
+                            break
 
                     new_game_button.text_str = "New Game"
                     new_game_button.draw(screen)
@@ -287,6 +356,21 @@ if __name__ == "__main__":
 
         pygame.display.flip()
         clock.tick(60)
+
+    # stop worker process
+    kill_q.put(True)
+    board_generator.terminate()
+
+    # save any remaining boards into a cache
+    if os.path.exists(".queens/cache.json"):
+        os.remove(".queens/cache.json")
+
+    baords_to_cache = []
+    while not board_queue.empty():
+        baords_to_cache.append(board_queue.get().to_dict())
+
+    with open(".queens/cache.json", "w") as f:
+        json.dump(baords_to_cache, f)
 
     # Done! Time to quit.
     pygame.quit()

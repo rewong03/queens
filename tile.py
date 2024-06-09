@@ -51,3 +51,16 @@ class Tile:
 
     def __repr__(self):
         return f"Tile({self.x}, {self.y}, {self.color}, {self.is_queen}, {self._state})"
+    
+    def to_dict(self):
+        return {
+            "x": self.x,
+            "y": self.y,
+            "color": self.color.value,
+            "is_queen": self.is_queen,
+            "state": self.state.value
+        }
+    
+    @staticmethod
+    def from_dict(d):
+        return Tile(d["x"], d["y"], Color(d["color"]), d["is_queen"], TileState(d["state"]))
