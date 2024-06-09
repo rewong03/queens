@@ -17,20 +17,16 @@ def print_board(board):
 def is_safe(board, row, col):
     # Check this row on left side
     for i in range(col):
-        if board[row][i] == 1:
+        if board[row][i]:
             return False
 
     # Check upper diagonal on left side
-    for i, j in zip(range(row, max(row - 2, -1), -1), range(col, max(row - 2, -1), -1)):
-        if board[i][j] == 1:
-            return False
+    if board[max(row - 1, 0)][max(col - 1, 0)]:
+        return False
 
     # Check lower diagonal on left side
-    for i, j in zip(
-        range(row, min(row + 2, GRID_SIZE), 1), range(col, max(col - 2, -1), -1)
-    ):
-        if board[i][j] == 1:
-            return False
+    if board[min(row + 1, GRID_SIZE - 1)][max(col - 1, 0)] == 1:
+        return False
 
     return True
 

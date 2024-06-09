@@ -165,7 +165,7 @@ def handle_grid_mouse_click(board, screen_posn, button):
                     for other_tile in board.color_groups[tile.color]
                 )
                 if next_state == TileState.QUEEN:
-                    if not other_queens:
+                    if Board._is_valid_queen_posn(board, (tile_i, tile_j)):
                         tile.state = next_state
                     else:
                         tile.state = TileState.EMPTY
@@ -203,6 +203,9 @@ if __name__ == "__main__":
     give_up_button = Button("Give Up :(", (200, 50), small_font)
     give_up_button.set_position((GRID_PIXEL_WIDTH + (SIDE_PANEL_WIDTH // 2), 400))
 
+    debug_button = Button("Debug", (200, 50), small_font)
+    debug_button.set_position((GRID_PIXEL_WIDTH + (SIDE_PANEL_WIDTH // 2), 500))
+
     # state for button logic
     check_until = 0  # time at which to stop showing "check" hints
 
@@ -226,7 +229,16 @@ if __name__ == "__main__":
                     new_game_button.is_in_bounds(pygame.mouse.get_pos())
                     and event.button == 1
                 ):
+                    new_game_button.text_str = "Loading..."
+                    new_game_button.draw(screen)
+                    pygame.display.flip()
+
                     board = Board.generate_random_board()
+
+                    new_game_button.text_str = "New Game"
+                    new_game_button.draw(screen)
+                    pygame.display.flip()
+
                     start_time = time.time()
 
                 if (
@@ -246,6 +258,12 @@ if __name__ == "__main__":
                             else:
                                 board.get_tile((i, j)).state = TileState.EMPTY
 
+                if (
+                    debug_button.is_in_bounds(pygame.mouse.get_pos())
+                    and event.button == 1
+                ):
+                    print(board)
+
         # draw everything
         draw_board_background(screen)
         draw_board(screen, small_font, board, check_mode=time.time() < check_until)
@@ -254,6 +272,7 @@ if __name__ == "__main__":
         new_game_button.draw(screen)
         check_board_button.draw(screen)
         give_up_button.draw(screen)
+        debug_button.draw(screen)
 
         pygame.display.flip()
         clock.tick(60)

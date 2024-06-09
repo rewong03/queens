@@ -33,19 +33,21 @@ class Tile:
 
     def copy(self):
         return Tile(self.x, self.y, self.color, self.is_queen, self._state)
-    
+
     @property
     def state(self):
         return self._state
-    
+
     @state.setter
     def state(self, value):
         if value == TileState.QUEEN and self._state != TileState.QUEEN:
             self.board.color_queen_count[self.color.value - 1] += 1
+            self.board.row_queen_count[self.x] += 1
         elif value != TileState.QUEEN and self._state == TileState.QUEEN:
             self.board.color_queen_count[self.color.value - 1] -= 1
+            self.board.row_queen_count[self.x] -= 1
 
         self._state = value
-    
+
     def __repr__(self):
         return f"Tile({self.x}, {self.y}, {self.color}, {self.is_queen}, {self._state})"

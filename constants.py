@@ -13,4 +13,5 @@ GRID_SIZE = 8
 
 FPS = 60
 
-MIN_COLOR_SIZE_COUNTS = {25: 1}
+# make sure we have 1 really big color and that none of the colors are single squares
+MIN_COLOR_SIZE_COUNTS = {25: 1, 2: 7}
