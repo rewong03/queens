@@ -4,6 +4,7 @@ from utils import grid_to_screen, screen_to_grid
 from colors import COLOR_TO_TUPLE
 from tile import TileState
 from button import Button
+import argparse
 
 import pygame
 import pygame.freetype
@@ -181,8 +182,15 @@ def handle_grid_mouse_click(board, screen_posn, button):
 if __name__ == "__main__":
     """
     TODO:
-    - color tint queen sprite if in check mode
+    - add caching mechanism to make board generation seem to take less time
+    - update win animation to give sprites appearence of "rotating"
+    - let users choose between a board size of 8, 9, 10 tiles
+    - let choosers choose a higher difficulty
     """
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-d', '--debug', action='store_true', help='Enable debug mode')
+    args = parser.parse_args()
+
     pygame.init()
     pygame.font.init()
     clock = pygame.time.Clock()
@@ -195,16 +203,16 @@ if __name__ == "__main__":
 
     # initialize buttons
     new_game_button = Button("New Game", (200, 50), small_font)
-    new_game_button.set_position((GRID_PIXEL_WIDTH + (SIDE_PANEL_WIDTH // 2), 200))
+    new_game_button.set_position((GRID_PIXEL_WIDTH + (SIDE_PANEL_WIDTH // 2), 150))
 
     check_board_button = Button("Check Board", (200, 50), small_font)
-    check_board_button.set_position((GRID_PIXEL_WIDTH + (SIDE_PANEL_WIDTH // 2), 300))
+    check_board_button.set_position((GRID_PIXEL_WIDTH + (SIDE_PANEL_WIDTH // 2), 250))
 
     give_up_button = Button("Give Up :(", (200, 50), small_font)
-    give_up_button.set_position((GRID_PIXEL_WIDTH + (SIDE_PANEL_WIDTH // 2), 400))
+    give_up_button.set_position((GRID_PIXEL_WIDTH + (SIDE_PANEL_WIDTH // 2), 350))
 
     debug_button = Button("Debug", (200, 50), small_font)
-    debug_button.set_position((GRID_PIXEL_WIDTH + (SIDE_PANEL_WIDTH // 2), 500))
+    debug_button.set_position((GRID_PIXEL_WIDTH + (SIDE_PANEL_WIDTH // 2), 450))
 
     # state for button logic
     check_until = 0  # time at which to stop showing "check" hints
@@ -261,6 +269,7 @@ if __name__ == "__main__":
                 if (
                     debug_button.is_in_bounds(pygame.mouse.get_pos())
                     and event.button == 1
+                    and args.debug
                 ):
                     print(board)
 
@@ -272,7 +281,9 @@ if __name__ == "__main__":
         new_game_button.draw(screen)
         check_board_button.draw(screen)
         give_up_button.draw(screen)
-        debug_button.draw(screen)
+
+        if args.debug:
+            debug_button.draw(screen)
 
         pygame.display.flip()
         clock.tick(60)
