@@ -25,11 +25,20 @@ class Tile:
         self._state = state
         self.board = None
 
-        self.animation_tick = random.randint(0, 500)
+        self.animation_tick = 0
+        self.animation_function = None
+
+    def set_animation_function(self, amp, freq, phase_shift, amp_shift):
+        self.animation_function = (
+            lambda tick: amp * math.sin(freq * tick + phase_shift) + amp_shift
+        )
 
     def get_next_scale_factor(self):
+        if not self.animation_function:
+            raise NotImplementedError("Missing win animation function")
+
         self.animation_tick += 1
-        return math.sin(self.animation_tick / 25) * 0.3 + 0.7
+        return self.animation_function(self.animation_tick)
 
     def copy(self):
         return Tile(self.x, self.y, self.color, self.is_queen, self._state)
@@ -51,16 +60,18 @@ class Tile:
 
     def __repr__(self):
         return f"Tile({self.x}, {self.y}, {self.color}, {self.is_queen}, {self._state})"
-    
+
     def to_dict(self):
         return {
             "x": self.x,
             "y": self.y,
             "color": self.color.value,
             "is_queen": self.is_queen,
-            "state": self.state.value
+            "state": self.state.value,
         }
-    
+
     @staticmethod
     def from_dict(d):
-        return Tile(d["x"], d["y"], Color(d["color"]), d["is_queen"], TileState(d["state"]))
+        return Tile(
+            d["x"], d["y"], Color(d["color"]), d["is_queen"], TileState(d["state"])
+        )

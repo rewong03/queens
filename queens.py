@@ -212,17 +212,14 @@ def _generate_boards_in_background(board_q, kill_q):
                 time.sleep(1)
 
 
-
 if __name__ == "__main__":
     """
     TODO:
-    - add caching mechanism to make board generation seem to take less time
-    - update win animation to give sprites appearence of "rotating"
     - let users choose between a board size of 8, 9, 10 tiles
     - let choosers choose a higher difficulty
     """
     parser = argparse.ArgumentParser()
-    parser.add_argument('-d', '--debug', action='store_true', help='Enable debug mode')
+    parser.add_argument("-d", "--debug", action="store_true", help="Enable debug mode")
     args = parser.parse_args()
 
     # setup a directory for state
@@ -243,7 +240,9 @@ if __name__ == "__main__":
 
     # spawn a worker process to get boards in the background
     kill_q = Queue()
-    board_generator = Process(target=_generate_boards_in_background, args=(board_queue, kill_q), daemon=True)
+    board_generator = Process(
+        target=_generate_boards_in_background, args=(board_queue, kill_q), daemon=True
+    )
     board_generator.start()
 
     pygame.init()
@@ -253,7 +252,9 @@ if __name__ == "__main__":
     # Set up the drawing window
     screen = pygame.display.set_mode([SCREEN_WIDTH, SCREEN_HEIGHT])
     board = board_queue.get()
+    board.set_up_win_animation()
     print("Got board!")
+
     large_font = pygame.freetype.SysFont("Comic Sans MS", 60)
     small_font = pygame.freetype.SysFont("Comic Sans MS", 20)
 
@@ -300,6 +301,7 @@ if __name__ == "__main__":
                     while True:
                         try:
                             board = board_queue.get_nowait()
+                            board.set_up_win_animation()
                             break
                         except:
                             pass

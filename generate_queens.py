@@ -47,7 +47,7 @@ def solve_NQ_until(board, col):
             if solve_NQ_until(board, col + 1):
                 return True
 
-            # If placing queen in board[i][col
+            # If placing queen in board[i][col]
             # doesn't lead to a solution, then
             # queen from board[i][col]
             board[i][col] = 0
@@ -77,8 +77,6 @@ def random_solve_NQ_until(board, col):
     else:
         # choose a random board
         random_board = random.choice(valid_boards)
-        # print_board(random_board)
-        # print("____")
 
         # solve rest of puzzle (randomly)
         random_solved_board = random_solve_NQ_until(random_board, col + 1)

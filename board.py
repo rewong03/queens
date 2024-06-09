@@ -5,6 +5,7 @@ from generate_queens import generate_random_board_posns, is_safe
 
 import random
 import time
+from math import atan2, pi
 
 
 class Board:
@@ -125,17 +126,42 @@ class Board:
         for i in range(1, len(Color) + 1):
             self.color_groups[Color(i)] = set()
 
-    def print_queens_only(self):
-        queens_only = []
-        for i in range(len(self._board)):
-            queens_only.append([])
-            for j in range(len(self._board[i])):
-                queens_only[-1].append(1 if self._board[i][j].is_queen else 0)
+    def to_dict(self):
+        board_dict = []
+        for i in range(GRID_SIZE):
+            for j in range(GRID_SIZE):
+                board_dict.append(self._board[i][j].to_dict())
 
-        for i in queens_only:
-            print(i)
+        return board_dict
 
-        return queens_only
+    def set_up_win_animation(self):
+        centroid_x, centroid_y = GRID_SIZE / 2, GRID_SIZE / 2
+
+        angles = []
+        for i, j in self.queen_posns:
+            tile = self._board[i][j]
+            angles.append(
+                (
+                    atan2(tile.y - centroid_y, tile.x - centroid_x),
+                    (tile.y - centroid_y) ** 2 + (tile.x - centroid_x) ** 2,
+                    tile,
+                )
+            )
+
+        angles.sort()
+        for i in range(len(angles)):
+            _, _, tile = angles[i]
+            tile.set_animation_function(0.3, 2 * pi / 50, i * 2 * pi / len(angles), 0.7)
+
+    @staticmethod
+    def from_dict(d):
+        board = Board()
+
+        for tile_d in d:
+            tile = Tile.from_dict(tile_d)
+            board.set_tile((tile.x, tile.y), tile)
+
+        return board
 
     @staticmethod
     # @profile
@@ -309,4 +335,8 @@ class Board:
 
 
 if __name__ == "__main__":
-    pass
+    import json
+
+    board = Board.generate_random_board()
+    json.dumps(board.to_dict())
+    board.set_up_win_animation()
